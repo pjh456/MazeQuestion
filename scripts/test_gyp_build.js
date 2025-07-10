@@ -31,5 +31,4 @@ function printMaze() {
 
 // printMaze();
 
-console.log(maze.start_pos);
-console.log(maze.start_pos());
+console.log(maze.start_pos()[0]);
