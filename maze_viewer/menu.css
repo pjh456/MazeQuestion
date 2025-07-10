@@ -1,0 +1,82 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#toolbar {
+    padding: 10px;
+    background: #f0f0f0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+#grid-container {
+    width: 50%;
+    border-right: 1px solid #ccc;
+    overflow: auto;
+    position: relative;
+}
+
+#grid {
+    display: grid;
+    background: #ccc;
+    transform-origin: top left;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.cell {
+    width: 100%;
+    height: 100%;
+    background: white;
+    text-align: center;
+    line-height: 1;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+.unexplored {
+    background: grey;
+}
+
+.start {
+    background: green;
+}
+
+.end {
+    background: red;
+}
+
+.body {
+    background: blue;
+}
+
+.wall {
+    background: black;
+}
+
+#editor {
+    width: 50%;
+    height: 100%;
+}
+
+#log {
+    height: 100px;
+    overflow-y: auto;
+    background: #222;
+    color: #0f0;
+    padding: 5px;
+    font-family: monospace;
+    white-space: pre-wrap;
+}

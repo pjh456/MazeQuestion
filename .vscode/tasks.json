@@ -1,0 +1,40 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "C/C++: g++.exe maze_generator",
+            "command": "E://Programs/MinGW/bin/g++.exe",
+            "args": [
+                "--%",
+                "-fdiagnostics-color=always",
+                "-g",
+                "-std=c++17",
+                // "-static-libgcc",
+                // "-static-libstdc++",
+                // "-Wl,-Bstatic",
+                // "-lstdc++",
+                // "-lwinpthread",
+                // "-Wl,-Bdynamic",
+                "-static",
+                "${workspaceFolder}/maze_generator/*.cpp",
+                "-o",
+                "${workspaceFolder}/${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "PATH": "E:/Programs/MinGW/bin;${env:PATH}"
+                },
+                // "shell": {
+                //     "executable": "cmd.exe"
+                // }
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "调试器生成的任务。"
+        }
+    ],
+    "version": "2.0.0"
+}

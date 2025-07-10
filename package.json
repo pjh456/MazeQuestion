@@ -1,0 +1,58 @@
+{
+  "name": "maze-question",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "pjh123",
+  "license": "MIT",
+  "description": "A maze question GUI, with DFS and BFS solution.",
+  "dependencies": {
+    "acorn": "^8.15.0",
+    "monaco-editor": "^0.44.0",
+    "node-addon-api": "^8.4.0"
+  },
+  "devDependencies": {
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12",
+    "node-gyp": "^11.2.0"
+  },
+  "build": {
+    "appId": "com.pjh123.maze-question",
+    "productName": "Maze-Question",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "maze_viewer/*.js",
+      "maze_viewer/*.css",
+      "maze_viewer/*.html",
+      "build/Release/*.node",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "build/Release/",
+        "to": "build/Release",
+        "filter": [
+          "*.node"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": "x64"
+        }
+      ],
+      "artifactName": "${productName}.exe"
+    }
+  }
+}
