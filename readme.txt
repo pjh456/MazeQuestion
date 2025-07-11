@@ -31,13 +31,15 @@ print：
 2. 变量赋值：使用 = 连接变量和值，左侧为被赋值的变量，右侧为将要赋给这个变量的值（也可以是变量，会取出变量的值赋给左侧的变量）
 Javascript 的一个变量可以承载多种类型，如：let x = 1; x = "Hello world!"; 是合法的。
 
-3. 函数声明：不同于 C++ 需要在函数名前写明类型、参数列表里注明参数类型，Javascript 的函数声明使用 function，
-如：function add(x, y) { return x + y; }
-再如：function greet() { print("Hello world!"); }
+3. 函数声明：不同于 C++ 需要在函数名前写明类型、参数列表里注明参数类型，Javascript 的函数声明使用 async function，
+如：async function add(x, y) { return x + y; }
+再如：async function greet() { print("Hello world!"); }
 
-4. 函数和变量调用和 C++、Python 等大众语言都是一致的，变量直接写变量名，函数需要在后面加括号和参数，
-如：add(1, 2);
-再如：greet();
+4. 变量调用和 C++、Python 等大众语言一致，变量直接写变量名；函数调用需要在函数名前加 "await "，在后面加括号和参数，
+如：await add(1, 2);
+再如：await greet();
+但是语言内支持的函数不需要手动添加await！
+如：look_up();
 
 5. 循环：可以和 C++ 一样使用，
 如 for(let i=1; i <= 10; i++) { }

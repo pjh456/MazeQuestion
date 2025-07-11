@@ -2,23 +2,17 @@
 const path = require('path');
 const maze_api = require(path.resolve(__dirname, 'build/Release/maze.node'));
 const vm = require('vm');
-const { parentPort } = require('worker_threads');
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 let nativeMaze = null;
 let logCallback = (msg) => console.log(msg);
-let moveCallback = () => console.log("move!");
+let moveCallback = (changed_pos_arr) => console.log("move!");
 let initCallback = () => console.log("init!");
 
-let maze_object_map = {
-    context_maze: nativeMaze
-};
+let maze_object_map = { context_maze: nativeMaze };
+let updateCounter = 0;
 
-let delayms = 300;
-
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+const move_functions = ['move_up', 'move_down', 'move_left', 'move_right'];
 
 function buildMazeApiMap() {
     return {
@@ -28,46 +22,10 @@ function buildMazeApiMap() {
         look_right: (idx = 0) => maze_object_map.context_maze.look_right(idx),
         stand: (idx = 0) => maze_object_map.context_maze.stand(idx),
 
-        move_up: (idx = 0) => {
-            maze_object_map.context_maze.move_up(idx);
-            moveCallback();
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve();
-                }, delayms);
-            });
-        },
-        move_down: (idx = 0) => {
-            maze_object_map.context_maze.move_down(idx);
-            moveCallback();
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve();
-                }, delayms);
-            });
-        },
-        move_left: (idx = 0) => {
-            maze_object_map.context_maze.move_left(idx);
-            moveCallback();
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve();
-                }, delayms);
-            });
-        },
-        move_right: (idx = 0) => {
-            maze_object_map.context_maze.move_right(idx);
-            moveCallback();
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve();
-                }, delayms);
-            });
-        },
-        // move_up: (idx = 0) => { maze_object_map.context_maze.move_up(idx); moveCallback(); },
-        // move_down: (idx = 0) => { maze_object_map.context_maze.move_down(idx); moveCallback(); },
-        // move_left: (idx = 0) => { maze_object_map.context_maze.move_left(idx); moveCallback(); },
-        // move_right: (idx = 0) => { maze_object_map.context_maze.move_right(idx); moveCallback(); },
+        move_up: (idx = 0) => maze_object_map.context_maze.move_up(idx),
+        move_down: (idx = 0) => maze_object_map.context_maze.move_down(idx),
+        move_left: (idx = 0) => maze_object_map.context_maze.move_left(idx),
+        move_right: (idx = 0) => maze_object_map.context_maze.move_right(idx),
 
         start_pos: () => maze_object_map.context_maze.start_pos(),
         end_pos: () => maze_object_map.context_maze.end_pos(),
@@ -82,32 +40,51 @@ function buildMazeApiMap() {
     };
 }
 
-// Object.freeze(maze_api_map);
-
-// vm
-
-function buildAllowedContext() {
-    return {
-        print: (...args) => {
-            const output = args.map(String).join(' ');
-            logCallback(output);
-        },
-        ...buildMazeApiMap()
-    };
-}
-
 contextBridge.exposeInMainWorld('sandbox', {
     run: async (code) => {
-        const context = vm.createContext(buildAllowedContext());
-        try {
-            await vm.runInContext(code, context);
-        }
-        catch (err) {
-            logCallback('[Error]' + err.message);
-            console.error(err.message);
-        }
+        updateCounter = 0;
+        ipcRenderer.send('run-user-code', code);
     },
     onPrint: (callback) => { logCallback = callback; }
+});
+
+ipcRenderer.on('from-vm', (event, msg) => {
+    const maze_api_map = buildMazeApiMap();
+    console.log(msg);
+
+    switch (msg.type) {
+        case 'done':
+            if (updateCounter === 0) moveCallback();
+            break;
+        case 'changed':
+            ipcRenderer.send('get-data', { id: msg.id, data: maze_object_map.context_maze.changed_pos() });
+            break;
+        case 'update':
+            break;
+        case 'print':
+            logCallback(msg.data);
+            break;
+        default:
+            if (move_functions.includes(msg.type)) {
+                updateCounter++;
+                maze_api_map[msg.type](msg.data);
+            }
+            else {
+                ipcRenderer.send('get-data', { id: msg.id, data: maze_api_map[msg.type](msg.data) });
+            }
+            break;
+    }
+});
+
+ipcRenderer.on('from-system', (event, msg) => {
+    // const maze_api_map = buildMazeApiMap();
+    console.log('from-system', msg);
+    if (msg.type === 'update') {
+        updateCounter--;
+        moveCallback(msg.data);
+    }
+    else if (msg.type === 'done' || msg.type === 'changed' || msg.type === 'print') return;
+    else if (move_functions.includes(msg.type)) return;
 });
 
 // maze api
@@ -118,12 +95,13 @@ contextBridge.exposeInMainWorld('maze_api', {
         const maze_api_map = buildMazeApiMap();
         return {
             ...maze_api_map,
-            block_data: () => { return maze_object_map.context_maze.block_data(); }
+            map_data: () => maze_object_map.context_maze.map_data(),
+            block_type: (r, c) => maze_object_map.context_maze.block_type(r, c)
         }
     },
     reset: () => { maze_object_map.context_maze.reset(); console.log("reset!"); initCallback(); },
     changed: () => maze_object_map.context_maze.changed_pos(),
     onMove: (callback) => { moveCallback = callback; },
-    onInit: (callback) => { initCallback = callback; }
+    onInit: (callback) => { initCallback = callback; },
 });
 

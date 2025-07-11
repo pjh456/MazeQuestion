@@ -53,7 +53,8 @@ public:
     Napi::Value pos_size(const Napi::CallbackInfo &);
 
 public:
-    Napi::Value block_data(const Napi::CallbackInfo &);
+    Napi::Value map_data(const Napi::CallbackInfo &);
+    Napi::Value block_type(const Napi::CallbackInfo &);
     Napi::Value reset(const Napi::CallbackInfo &);
 
 private:
@@ -89,7 +90,8 @@ Napi::Object MazeAdapter::Init(Napi::Env env, Napi::Object exports)
          InstanceMethod("col_count", &MazeAdapter::col_count),
          InstanceMethod("pos_size", &MazeAdapter::pos_size),
 
-         InstanceMethod("block_data", &MazeAdapter::block_data),
+         InstanceMethod("map_data", &MazeAdapter::map_data),
+         InstanceMethod("block_type", &MazeAdapter::block_type),
          InstanceMethod("reset", &MazeAdapter::reset)});
     exports.Set("MazeAdapter", func);
     return exports;
@@ -313,7 +315,7 @@ Napi::Value MazeAdapter::pos_size(const Napi::CallbackInfo &info)
     return Napi::Number::New(info.Env(), maze.current_pos_size());
 }
 
-Napi::Value MazeAdapter::block_data(const Napi::CallbackInfo &info)
+Napi::Value MazeAdapter::map_data(const Napi::CallbackInfo &info)
 {
     std::vector<Block> raw_data = maze.block_data();
     size_t map_cols = 2 * maze.col_count() + 1;
@@ -333,6 +335,13 @@ Napi::Value MazeAdapter::block_data(const Napi::CallbackInfo &info)
     }
 
     return outer;
+}
+
+Napi::Value MazeAdapter::block_type(const Napi::CallbackInfo &info)
+{
+    size_t r = info[0].As<Napi::Number>().Uint32Value();
+    size_t c = info[1].As<Napi::Number>().Uint32Value();
+    return blocktype2str(info.Env(), maze.look_pos({(int)r, (int)c}));
 }
 
 Napi::Value MazeAdapter::reset(const Napi::CallbackInfo &info)

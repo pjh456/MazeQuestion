@@ -75,83 +75,83 @@ require(['vs/editor/editor.main'], function () {
 function runBFS() {
     log('Loading BFS');
     editor.getModel().setValue(
-        `var death_pos_count = 0;
-
-function bfs_turn() {
+        `async function bfs_turn() {
     let size = pos_size();
-    for (let idx = death_pos_count; idx < size; idx++) {
-        if (stand(idx) === "end") {
+    while(size>0){
+        if (stand() === "end") {
             return true;
         }
 
-        if (look_up(idx) == "air") {
-            copy_pos(idx);
+        if (look_up() == "air") {
+            copy_pos();
             move_up(pos_size() - 1);
         }
 
-        if (look_down(idx) == "air") {
-            copy_pos(idx);
+        if (look_down() == "air") {
+            copy_pos();
             move_down(pos_size() - 1);
         }
 
-        if (look_left(idx) == "air") {
-            copy_pos(idx);
+        if (look_left() == "air") {
+            copy_pos();
             move_left(pos_size() - 1);
         }
 
-        if (look_right(idx) == "air") {
-            copy_pos(idx);
+        if (look_right() == "air") {
+            copy_pos();
             move_right(pos_size() - 1);
         }
+
+        remove_pos();
     }
-    death_pos_count = size;
+    
     return false;
 }
 
-function bfs() {
-    while (!bfs_turn());
+async function bfs() {
+    while (!await bfs_turn());
 }
 
-bfs();`
+await bfs();`
     );
 }
 
 function runDFS() {
     log('Loading DFS:');
     editor.getModel().setValue(
-        `function dfs() {
+        `async function dfs() {
     if (stand() === "end") {
         return true;
     }
 
     if (look_up() === "air") {
         move_up();
-        if (dfs()) return true;
+        if (await dfs()) return true;
         move_down();
     }
 
     if (look_down() === "air") {
         move_down();
-        if (dfs()) return true;
+        if (await dfs()) return true;
         move_up();
     }
 
     if (look_left() === "air") {
         move_left();
-        if (dfs()) return true;
+        if (await dfs()) return true;
         move_right();
     }
 
     if (look_right() === "air") {
         move_right();
-        if (dfs()) return true;
+        if (await dfs()) return true;
         move_left();
     }
 
     return false;
 }
 
-dfs();`
+await dfs();`
     );
 }
 function runUserCode() {

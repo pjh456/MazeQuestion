@@ -15,6 +15,7 @@ function printMaze() {
                 case "air": return " ";
                 case "start": return "S";
                 case "end": return "E";
+                case "head": return "?";
                 case "body": return "*";
                 default: return "?";
             }
@@ -24,11 +25,11 @@ function printMaze() {
 }
 
 // 执行打印
-// printMaze();
+printMaze();
 
-// maze.move_up();
+maze.move_up();
 // maze.move_up();
 
-// printMaze();
+printMaze();
 
 console.log(maze.start_pos()[0]);

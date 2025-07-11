@@ -51,11 +51,15 @@ body {
 }
 
 .start {
-    background: green;
+    background: red;
 }
 
 .end {
-    background: red;
+    background: green;
+}
+
+.head {
+    background: orange;
 }
 
 .body {

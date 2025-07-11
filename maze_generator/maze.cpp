@@ -13,7 +13,7 @@ void Maze::copy_current_pos(size_t idx)
 
 void Maze::remove_current_pos(size_t idx)
 {
-    // current_pos_set.erase(current_pos_set.begin() + idx);
+    current_pos_set.erase(current_pos_set.begin() + idx);
 }
 
 size_t Maze::current_pos_size() { return current_pos_set.size(); }
