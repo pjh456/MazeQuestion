@@ -24,7 +24,8 @@ app.whenReady().then(() => {
 
 ipcMain.on('run-user-code', (event, code) => {
     if (vmWorker) { vmWorker.terminate(); }
-    vmWorker = new Worker('./maze_viewer/worker.js');
+    const workerPath = path.join(__dirname, 'maze_viewer', 'worker.js');
+    vmWorker = new Worker(workerPath);
 
     vmWorker.on('message', (msg) => win.webContents.send('from-vm', msg));
     vmWorker.on('message', (msg) => win.webContents.send('from-system', msg));
